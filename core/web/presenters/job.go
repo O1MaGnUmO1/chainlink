@@ -310,110 +310,6 @@ func NewVRFSpec(spec *job.VRFSpec) *VRFSpec {
 	}
 }
 
-// BlockhashStoreSpec defines the job parameters for a blockhash store feeder job.
-type BlockhashStoreSpec struct {
-	CoordinatorV1Address           *ethkey.EIP55Address  `json:"coordinatorV1Address"`
-	CoordinatorV2Address           *ethkey.EIP55Address  `json:"coordinatorV2Address"`
-	CoordinatorV2PlusAddress       *ethkey.EIP55Address  `json:"coordinatorV2PlusAddress"`
-	WaitBlocks                     int32                 `json:"waitBlocks"`
-	LookbackBlocks                 int32                 `json:"lookbackBlocks"`
-	HeartbeatPeriod                time.Duration         `json:"heartbeatPeriod"`
-	BlockhashStoreAddress          ethkey.EIP55Address   `json:"blockhashStoreAddress"`
-	TrustedBlockhashStoreAddress   *ethkey.EIP55Address  `json:"trustedBlockhashStoreAddress"`
-	TrustedBlockhashStoreBatchSize int32                 `json:"trustedBlockhashStoreBatchSize"`
-	PollPeriod                     time.Duration         `json:"pollPeriod"`
-	RunTimeout                     time.Duration         `json:"runTimeout"`
-	EVMChainID                     *big.Big              `json:"evmChainID"`
-	FromAddresses                  []ethkey.EIP55Address `json:"fromAddresses"`
-	CreatedAt                      time.Time             `json:"createdAt"`
-	UpdatedAt                      time.Time             `json:"updatedAt"`
-}
-
-// NewBlockhashStoreSpec creates a new BlockhashStoreSpec for the given parameters.
-func NewBlockhashStoreSpec(spec *job.BlockhashStoreSpec) *BlockhashStoreSpec {
-	return &BlockhashStoreSpec{
-		CoordinatorV1Address:           spec.CoordinatorV1Address,
-		CoordinatorV2Address:           spec.CoordinatorV2Address,
-		CoordinatorV2PlusAddress:       spec.CoordinatorV2PlusAddress,
-		WaitBlocks:                     spec.WaitBlocks,
-		LookbackBlocks:                 spec.LookbackBlocks,
-		HeartbeatPeriod:                spec.HeartbeatPeriod,
-		BlockhashStoreAddress:          spec.BlockhashStoreAddress,
-		TrustedBlockhashStoreAddress:   spec.TrustedBlockhashStoreAddress,
-		TrustedBlockhashStoreBatchSize: spec.TrustedBlockhashStoreBatchSize,
-		PollPeriod:                     spec.PollPeriod,
-		RunTimeout:                     spec.RunTimeout,
-		EVMChainID:                     spec.EVMChainID,
-		FromAddresses:                  spec.FromAddresses,
-	}
-}
-
-// BlockHeaderFeederSpec defines the job parameters for a blcok header feeder job.
-type BlockHeaderFeederSpec struct {
-	CoordinatorV1Address       *ethkey.EIP55Address  `json:"coordinatorV1Address"`
-	CoordinatorV2Address       *ethkey.EIP55Address  `json:"coordinatorV2Address"`
-	CoordinatorV2PlusAddress   *ethkey.EIP55Address  `json:"coordinatorV2PlusAddress"`
-	WaitBlocks                 int32                 `json:"waitBlocks"`
-	LookbackBlocks             int32                 `json:"lookbackBlocks"`
-	BlockhashStoreAddress      ethkey.EIP55Address   `json:"blockhashStoreAddress"`
-	BatchBlockhashStoreAddress ethkey.EIP55Address   `json:"batchBlockhashStoreAddress"`
-	PollPeriod                 time.Duration         `json:"pollPeriod"`
-	RunTimeout                 time.Duration         `json:"runTimeout"`
-	EVMChainID                 *big.Big              `json:"evmChainID"`
-	FromAddresses              []ethkey.EIP55Address `json:"fromAddresses"`
-	GetBlockhashesBatchSize    uint16                `json:"getBlockhashesBatchSize"`
-	StoreBlockhashesBatchSize  uint16                `json:"storeBlockhashesBatchSize"`
-
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
-}
-
-// NewBlockHeaderFeederSpec creates a new BlockHeaderFeederSpec for the given parameters.
-func NewBlockHeaderFeederSpec(spec *job.BlockHeaderFeederSpec) *BlockHeaderFeederSpec {
-	return &BlockHeaderFeederSpec{
-		CoordinatorV1Address:       spec.CoordinatorV1Address,
-		CoordinatorV2Address:       spec.CoordinatorV2Address,
-		CoordinatorV2PlusAddress:   spec.CoordinatorV2PlusAddress,
-		WaitBlocks:                 spec.WaitBlocks,
-		LookbackBlocks:             spec.LookbackBlocks,
-		BlockhashStoreAddress:      spec.BlockhashStoreAddress,
-		BatchBlockhashStoreAddress: spec.BatchBlockhashStoreAddress,
-		PollPeriod:                 spec.PollPeriod,
-		RunTimeout:                 spec.RunTimeout,
-		EVMChainID:                 spec.EVMChainID,
-		FromAddresses:              spec.FromAddresses,
-		GetBlockhashesBatchSize:    spec.GetBlockhashesBatchSize,
-		StoreBlockhashesBatchSize:  spec.StoreBlockhashesBatchSize,
-	}
-}
-
-// BootstrapSpec defines the spec details of a BootstrapSpec Job
-type BootstrapSpec struct {
-	ContractID                             string                 `json:"contractID"`
-	Relay                                  relay.Network          `json:"relay"`
-	RelayConfig                            map[string]interface{} `json:"relayConfig"`
-	BlockchainTimeout                      models.Interval        `json:"blockchainTimeout"`
-	ContractConfigTrackerSubscribeInterval models.Interval        `json:"contractConfigTrackerSubscribeInterval"`
-	ContractConfigTrackerPollInterval      models.Interval        `json:"contractConfigTrackerPollInterval"`
-	ContractConfigConfirmations            uint16                 `json:"contractConfigConfirmations"`
-	CreatedAt                              time.Time              `json:"createdAt"`
-	UpdatedAt                              time.Time              `json:"updatedAt"`
-}
-
-// NewBootstrapSpec initializes a new BootstrapSpec from a job.BootstrapSpec
-func NewBootstrapSpec(spec *job.BootstrapSpec) *BootstrapSpec {
-	return &BootstrapSpec{
-		ContractID:                        spec.ContractID,
-		Relay:                             spec.Relay,
-		RelayConfig:                       spec.RelayConfig,
-		BlockchainTimeout:                 spec.BlockchainTimeout,
-		ContractConfigTrackerPollInterval: spec.ContractConfigTrackerPollInterval,
-		ContractConfigConfirmations:       spec.ContractConfigConfirmations,
-		CreatedAt:                         spec.CreatedAt,
-		UpdatedAt:                         spec.UpdatedAt,
-	}
-}
-
 type GatewaySpec struct {
 	GatewayConfig map[string]interface{} `json:"gatewayConfig"`
 	CreatedAt     time.Time              `json:"createdAt"`
@@ -465,9 +361,6 @@ type JobResource struct {
 	KeeperSpec             *KeeperSpec             `json:"keeperSpec"`
 	VRFSpec                *VRFSpec                `json:"vrfSpec"`
 	WebhookSpec            *WebhookSpec            `json:"webhookSpec"`
-	BlockhashStoreSpec     *BlockhashStoreSpec     `json:"blockhashStoreSpec"`
-	BlockHeaderFeederSpec  *BlockHeaderFeederSpec  `json:"blockHeaderFeederSpec"`
-	BootstrapSpec          *BootstrapSpec          `json:"bootstrapSpec"`
 	GatewaySpec            *GatewaySpec            `json:"gatewaySpec"`
 	PipelineSpec           PipelineSpec            `json:"pipelineSpec"`
 	Errors                 []JobError              `json:"errors"`
@@ -488,28 +381,12 @@ func NewJobResource(j job.Job) *JobResource {
 	}
 
 	switch j.Type {
-	case job.DirectRequest:
-		resource.DirectRequestSpec = NewDirectRequestSpec(j.DirectRequestSpec)
-	case job.FluxMonitor:
-		resource.FluxMonitorSpec = NewFluxMonitorSpec(j.FluxMonitorSpec)
-	case job.Cron:
-		resource.CronSpec = NewCronSpec(j.CronSpec)
-	case job.OffchainReporting:
-		resource.OffChainReportingSpec = NewOffChainReportingSpec(j.OCROracleSpec)
-	case job.OffchainReporting2:
-		resource.OffChainReporting2Spec = NewOffChainReporting2Spec(j.OCR2OracleSpec)
 	case job.Keeper:
 		resource.KeeperSpec = NewKeeperSpec(j.KeeperSpec)
 	case job.VRF:
 		resource.VRFSpec = NewVRFSpec(j.VRFSpec)
 	case job.Webhook:
 		resource.WebhookSpec = NewWebhookSpec(j.WebhookSpec)
-	case job.BlockhashStore:
-		resource.BlockhashStoreSpec = NewBlockhashStoreSpec(j.BlockhashStoreSpec)
-	case job.BlockHeaderFeeder:
-		resource.BlockHeaderFeederSpec = NewBlockHeaderFeederSpec(j.BlockHeaderFeederSpec)
-	case job.Bootstrap:
-		resource.BootstrapSpec = NewBootstrapSpec(j.BootstrapSpec)
 	case job.Gateway:
 		resource.GatewaySpec = NewGatewaySpec(j.GatewaySpec)
 	case job.LegacyGasStationServer, job.LegacyGasStationSidecar:

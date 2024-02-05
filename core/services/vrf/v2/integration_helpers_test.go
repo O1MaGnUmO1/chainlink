@@ -230,21 +230,6 @@ func testMultipleConsumersNeedBHS(
 		gasLanePriceWei)
 	keyHash := vrfJobs[0].VRFSpec.PublicKey.MustHash()
 
-	var (
-		v2CoordinatorAddress     string
-		v2PlusCoordinatorAddress string
-	)
-
-	if vrfVersion == vrfcommon.V2 {
-		v2CoordinatorAddress = coordinatorAddress.String()
-	} else if vrfVersion == vrfcommon.V2Plus {
-		v2PlusCoordinatorAddress = coordinatorAddress.String()
-	}
-
-	_ = vrftesthelpers.CreateAndStartBHSJob(
-		t, bhsKeyAddresses, app, uni.bhsContractAddress.String(), "",
-		v2CoordinatorAddress, v2PlusCoordinatorAddress, "", 0, 200, 0, 100)
-
 	// Ensure log poller is ready and has all logs.
 	require.NoError(t, app.GetRelayers().LegacyEVMChains().Slice()[0].LogPoller().Ready())
 	require.NoError(t, app.GetRelayers().LegacyEVMChains().Slice()[0].LogPoller().Replay(testutils.Context(t), 1))
@@ -377,25 +362,6 @@ func testMultipleConsumersNeedTrustedBHS(
 		false,
 		gasLanePriceWei)
 	keyHash := vrfJobs[0].VRFSpec.PublicKey.MustHash()
-
-	var (
-		v2CoordinatorAddress     string
-		v2PlusCoordinatorAddress string
-	)
-
-	if vrfVersion == vrfcommon.V2 {
-		v2CoordinatorAddress = coordinatorAddress.String()
-	} else if vrfVersion == vrfcommon.V2Plus {
-		v2PlusCoordinatorAddress = coordinatorAddress.String()
-	}
-
-	waitBlocks := 100
-	if addedDelay {
-		waitBlocks = 400
-	}
-	_ = vrftesthelpers.CreateAndStartBHSJob(
-		t, bhsKeyAddressesStrings, app, "", "",
-		v2CoordinatorAddress, v2PlusCoordinatorAddress, uni.trustedBhsContractAddress.String(), 20, 1000, 0, waitBlocks)
 
 	// Ensure log poller is ready and has all logs.
 	chain := app.GetRelayers().LegacyEVMChains().Slice()[0]
@@ -737,10 +703,6 @@ func testBlockHeaderFeeder(
 	nConsumers := len(consumers)
 
 	vrfKey := cltest.MustGenerateRandomKey(t)
-	bhfKey := cltest.MustGenerateRandomKey(t)
-	bhfKeys := []string{bhfKey.Address.String()}
-
-	sendEth(t, ownerKey, uni.backend, bhfKey.Address, 10)
 	sendEth(t, ownerKey, uni.backend, vrfKey.Address, 10)
 
 	gasLanePriceWei := assets.GWei(10)
@@ -756,7 +718,7 @@ func testBlockHeaderFeeder(
 		c.EVM[0].LogPollInterval = models.MustNewDuration(1 * time.Second)
 		c.EVM[0].FinalityDepth = ptr[uint32](2)
 	})
-	app := cltest.NewApplicationWithConfigV2AndKeyOnSimulatedBlockchain(t, config, uni.backend, ownerKey, vrfKey, bhfKey)
+	app := cltest.NewApplicationWithConfigV2AndKeyOnSimulatedBlockchain(t, config, uni.backend, ownerKey, vrfKey)
 	require.NoError(t, app.Start(testutils.Context(t)))
 
 	// Create VRF job.
@@ -773,19 +735,6 @@ func testBlockHeaderFeeder(
 		false,
 		gasLanePriceWei)
 	keyHash := vrfJobs[0].VRFSpec.PublicKey.MustHash()
-	var (
-		v2coordinatorAddress     string
-		v2plusCoordinatorAddress string
-	)
-	if vrfVersion == vrfcommon.V2 {
-		v2coordinatorAddress = coordinatorAddress.String()
-	} else if vrfVersion == vrfcommon.V2Plus {
-		v2plusCoordinatorAddress = coordinatorAddress.String()
-	}
-
-	_ = vrftesthelpers.CreateAndStartBlockHeaderFeederJob(
-		t, bhfKeys, app, uni.bhsContractAddress.String(), uni.batchBHSContractAddress.String(), "",
-		v2coordinatorAddress, v2plusCoordinatorAddress)
 
 	// Ensure log poller is ready and has all logs.
 	require.NoError(t, app.GetRelayers().LegacyEVMChains().Slice()[0].LogPoller().Ready())

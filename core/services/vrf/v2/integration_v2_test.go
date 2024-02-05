@@ -78,7 +78,6 @@ import (
 	evmrelay "github.com/smartcontractkit/chainlink/v2/core/services/relay/evm"
 	"github.com/smartcontractkit/chainlink/v2/core/services/signatures/secp256k1"
 	"github.com/smartcontractkit/chainlink/v2/core/services/vrf/proof"
-	v1 "github.com/smartcontractkit/chainlink/v2/core/services/vrf/v1"
 	v22 "github.com/smartcontractkit/chainlink/v2/core/services/vrf/v2"
 	"github.com/smartcontractkit/chainlink/v2/core/services/vrf/vrfcommon"
 	"github.com/smartcontractkit/chainlink/v2/core/services/vrf/vrftesthelpers"
@@ -2023,14 +2022,7 @@ func TestStartingCountsV1(t *testing.T) {
 	legacyChains := evmrelay.NewLegacyChainsFromRelayerExtenders(relayExtenders)
 	chain, err := legacyChains.Get(testutils.SimulatedChainID.String())
 	require.NoError(t, err)
-	listenerV1 := &v1.Listener{
-		Chain: chain,
-	}
 	listenerV2 := v22.MakeTestListenerV2(chain)
-	var counts map[[32]byte]uint64
-	counts, err = listenerV1.GetStartingResponseCountsV1(testutils.Context(t))
-	require.NoError(t, err)
-	assert.Equal(t, 0, len(counts))
 	err = ks.Unlock(testutils.Password)
 	require.NoError(t, err)
 	k, err := ks.Eth().Create(testutils.SimulatedChainID)
@@ -2180,13 +2172,6 @@ func TestStartingCountsV1(t *testing.T) {
 		_, err = txStore.InsertReceipt(&receipts[i])
 		require.NoError(t, err)
 	}
-
-	counts, err = listenerV1.GetStartingResponseCountsV1(testutils.Context(t))
-	require.NoError(t, err)
-	assert.Equal(t, 3, len(counts))
-	assert.Equal(t, uint64(1), counts[evmutils.PadByteToHash(0x10)])
-	assert.Equal(t, uint64(2), counts[evmutils.PadByteToHash(0x11)])
-	assert.Equal(t, uint64(2), counts[evmutils.PadByteToHash(0x12)])
 
 	countsV2, err := listenerV2.GetStartingResponseCountsV2(testutils.Context(t))
 	require.NoError(t, err)

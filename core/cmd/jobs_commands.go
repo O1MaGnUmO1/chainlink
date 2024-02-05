@@ -120,25 +120,9 @@ func (p JobPresenter) FriendlyTasks() []string {
 // type in RFC3339 format.
 func (p JobPresenter) FriendlyCreatedAt() string {
 	switch p.Type {
-	case presenters.DirectRequestJobSpec:
-		if p.DirectRequestSpec != nil {
-			return p.DirectRequestSpec.CreatedAt.Format(time.RFC3339)
-		}
-	case presenters.FluxMonitorJobSpec:
-		if p.FluxMonitorSpec != nil {
-			return p.FluxMonitorSpec.CreatedAt.Format(time.RFC3339)
-		}
-	case presenters.OffChainReportingJobSpec:
-		if p.OffChainReportingSpec != nil {
-			return p.OffChainReportingSpec.CreatedAt.Format(time.RFC3339)
-		}
 	case presenters.KeeperJobSpec:
 		if p.KeeperSpec != nil {
 			return p.KeeperSpec.CreatedAt.Format(time.RFC3339)
-		}
-	case presenters.CronJobSpec:
-		if p.CronSpec != nil {
-			return p.CronSpec.CreatedAt.Format(time.RFC3339)
 		}
 	case presenters.VRFJobSpec:
 		if p.VRFSpec != nil {
@@ -147,18 +131,6 @@ func (p JobPresenter) FriendlyCreatedAt() string {
 	case presenters.WebhookJobSpec:
 		if p.WebhookSpec != nil {
 			return p.WebhookSpec.CreatedAt.Format(time.RFC3339)
-		}
-	case presenters.BlockhashStoreJobSpec:
-		if p.BlockhashStoreSpec != nil {
-			return p.BlockhashStoreSpec.CreatedAt.Format(time.RFC3339)
-		}
-	case presenters.BlockHeaderFeederJobSpec:
-		if p.BlockHeaderFeederSpec != nil {
-			return p.BlockHeaderFeederSpec.CreatedAt.Format(time.RFC3339)
-		}
-	case presenters.BootstrapJobSpec:
-		if p.BootstrapSpec != nil {
-			return p.BootstrapSpec.CreatedAt.Format(time.RFC3339)
 		}
 	case presenters.GatewayJobSpec:
 		if p.GatewaySpec != nil {
