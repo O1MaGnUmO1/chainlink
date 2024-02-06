@@ -422,76 +422,16 @@ func UnmarshalTaskFromMap(taskType TaskType, taskMap interface{}, ID int, dotID 
 
 	var task Task
 	switch taskType {
-	case TaskTypePanic:
-		task = &PanicTask{BaseTask: BaseTask{id: ID, dotID: dotID}}
-	case TaskTypeHTTP:
-		task = &HTTPTask{BaseTask: BaseTask{id: ID, dotID: dotID}}
-	case TaskTypeBridge:
-		task = &BridgeTask{BaseTask: BaseTask{id: ID, dotID: dotID}}
-	case TaskTypeMean:
-		task = &MeanTask{BaseTask: BaseTask{id: ID, dotID: dotID}}
-	case TaskTypeMedian:
-		task = &MedianTask{BaseTask: BaseTask{id: ID, dotID: dotID}}
-	case TaskTypeMode:
-		task = &ModeTask{BaseTask: BaseTask{id: ID, dotID: dotID}}
-	case TaskTypeSum:
-		task = &SumTask{BaseTask: BaseTask{id: ID, dotID: dotID}}
-	case TaskTypeAny:
-		task = &AnyTask{BaseTask: BaseTask{id: ID, dotID: dotID}}
-	case TaskTypeJSONParse:
-		task = &JSONParseTask{BaseTask: BaseTask{id: ID, dotID: dotID}}
-	case TaskTypeMemo:
-		task = &MemoTask{BaseTask: BaseTask{id: ID, dotID: dotID}}
-	case TaskTypeMultiply:
-		task = &MultiplyTask{BaseTask: BaseTask{id: ID, dotID: dotID}}
-	case TaskTypeDivide:
-		task = &DivideTask{BaseTask: BaseTask{id: ID, dotID: dotID}}
-	case TaskTypeVRF:
-		task = &VRFTask{BaseTask: BaseTask{id: ID, dotID: dotID}}
 	case TaskTypeVRFV2:
 		task = &VRFTaskV2{BaseTask: BaseTask{id: ID, dotID: dotID}}
-	case TaskTypeVRFV2Plus:
-		task = &VRFTaskV2Plus{BaseTask: BaseTask{id: ID, dotID: dotID}}
 	case TaskTypeEstimateGasLimit:
 		task = &EstimateGasLimitTask{BaseTask: BaseTask{id: ID, dotID: dotID}}
 	case TaskTypeETHCall:
 		task = &ETHCallTask{BaseTask: BaseTask{id: ID, dotID: dotID}}
-	case TaskTypeETHTx:
-		task = &ETHTxTask{BaseTask: BaseTask{id: ID, dotID: dotID}}
-	case TaskTypeETHABIEncode:
-		task = &ETHABIEncodeTask{BaseTask: BaseTask{id: ID, dotID: dotID}}
-	case TaskTypeETHABIEncode2:
-		task = &ETHABIEncodeTask2{BaseTask: BaseTask{id: ID, dotID: dotID}}
 	case TaskTypeETHABIDecode:
 		task = &ETHABIDecodeTask{BaseTask: BaseTask{id: ID, dotID: dotID}}
 	case TaskTypeETHABIDecodeLog:
 		task = &ETHABIDecodeLogTask{BaseTask: BaseTask{id: ID, dotID: dotID}}
-	case TaskTypeCBORParse:
-		task = &CBORParseTask{BaseTask: BaseTask{id: ID, dotID: dotID}}
-	case TaskTypeFail:
-		task = &FailTask{BaseTask: BaseTask{id: ID, dotID: dotID}}
-	case TaskTypeMerge:
-		task = &MergeTask{BaseTask: BaseTask{id: ID, dotID: dotID}}
-	case TaskTypeLength:
-		task = &LengthTask{BaseTask: BaseTask{id: ID, dotID: dotID}}
-	case TaskTypeLessThan:
-		task = &LessThanTask{BaseTask: BaseTask{id: ID, dotID: dotID}}
-	case TaskTypeLookup:
-		task = &LookupTask{BaseTask: BaseTask{id: ID, dotID: dotID}}
-	case TaskTypeLowercase:
-		task = &LowercaseTask{BaseTask: BaseTask{id: ID, dotID: dotID}}
-	case TaskTypeUppercase:
-		task = &UppercaseTask{BaseTask: BaseTask{id: ID, dotID: dotID}}
-	case TaskTypeConditional:
-		task = &ConditionalTask{BaseTask: BaseTask{id: ID, dotID: dotID}}
-	case TaskTypeHexDecode:
-		task = &HexDecodeTask{BaseTask: BaseTask{id: ID, dotID: dotID}}
-	case TaskTypeHexEncode:
-		task = &HexEncodeTask{BaseTask: BaseTask{id: ID, dotID: dotID}}
-	case TaskTypeBase64Decode:
-		task = &Base64DecodeTask{BaseTask: BaseTask{id: ID, dotID: dotID}}
-	case TaskTypeBase64Encode:
-		task = &Base64EncodeTask{BaseTask: BaseTask{id: ID, dotID: dotID}}
 	default:
 		return nil, pkgerrors.Errorf(`unknown task type: "%v"`, taskType)
 	}

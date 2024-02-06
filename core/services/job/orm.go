@@ -106,29 +106,6 @@ func (o *orm) Close() error {
 }
 
 func (o *orm) AssertBridgesExist(p pipeline.Pipeline) error {
-	var bridgeNames = make(map[bridges.BridgeName]struct{})
-	var uniqueBridges []bridges.BridgeName
-	for _, task := range p.Tasks {
-		if task.Type() == pipeline.TaskTypeBridge {
-			// Bridge must exist
-			name := task.(*pipeline.BridgeTask).Name
-			bridge, err := bridges.ParseBridgeName(name)
-			if err != nil {
-				return err
-			}
-			if _, have := bridgeNames[bridge]; have {
-				continue
-			}
-			bridgeNames[bridge] = struct{}{}
-			uniqueBridges = append(uniqueBridges, bridge)
-		}
-	}
-	if len(uniqueBridges) != 0 {
-		_, err := o.bridgeORM.FindBridges(uniqueBridges)
-		if err != nil {
-			return err
-		}
-	}
 	return nil
 }
 
@@ -772,42 +749,6 @@ func (o *orm) findJob(jb *Job, col string, arg interface{}, qopts ...pg.QOpt) er
 }
 
 func (o *orm) FindJobIDsWithBridge(name string) (jids []int32, err error) {
-	err = o.q.Transaction(func(tx pg.Queryer) error {
-		query := `SELECT jobs.id, dot_dag_source FROM jobs JOIN pipeline_specs ON pipeline_specs.id = jobs.pipeline_spec_id WHERE dot_dag_source ILIKE '%' || $1 || '%' ORDER BY id`
-		var rows *sqlx.Rows
-		rows, err = tx.Queryx(query, name)
-		if err != nil {
-			return err
-		}
-		defer rows.Close()
-		var ids []int32
-		var sources []string
-		for rows.Next() {
-			var id int32
-			var source string
-			if err = rows.Scan(&id, &source); err != nil {
-				return err
-			}
-			ids = append(jids, id)
-			sources = append(sources, source)
-		}
-
-		for i, id := range ids {
-			var p *pipeline.Pipeline
-			p, err = pipeline.Parse(sources[i])
-			if err != nil {
-				return errors.Wrapf(err, "could not parse dag for job %d", id)
-			}
-			for _, task := range p.Tasks {
-				if task.Type() == pipeline.TaskTypeBridge {
-					if task.(*pipeline.BridgeTask).Name == name {
-						jids = append(jids, id)
-					}
-				}
-			}
-		}
-		return nil
-	})
 	return jids, errors.Wrap(err, "FindJobIDsWithBridge failed")
 }
 

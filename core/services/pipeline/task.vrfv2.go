@@ -15,6 +15,7 @@ import (
 	evmtypes "github.com/smartcontractkit/chainlink/v2/core/chains/evm/types"
 	"github.com/smartcontractkit/chainlink/v2/core/gethwrappers/generated/vrf_coordinator_v2"
 	"github.com/smartcontractkit/chainlink/v2/core/logger"
+	"github.com/smartcontractkit/chainlink/v2/core/services/keystore/keys/vrfkey"
 	"github.com/smartcontractkit/chainlink/v2/core/services/signatures/secp256k1"
 	"github.com/smartcontractkit/chainlink/v2/core/services/vrf/proof"
 )
@@ -22,6 +23,10 @@ import (
 var (
 	vrfCoordinatorV2ABI = evmtypes.MustGetABI(vrf_coordinator_v2.VRFCoordinatorV2ABI)
 )
+
+type VRFKeyStore interface {
+	GenerateProof(id string, seed *big.Int) (vrfkey.Proof, error)
+}
 
 type VRFTaskV2 struct {
 	BaseTask           `mapstructure:",squash"`

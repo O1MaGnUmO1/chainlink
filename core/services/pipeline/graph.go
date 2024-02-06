@@ -186,10 +186,6 @@ func (p *Pipeline) MinTimeout() (time.Duration, bool, error) {
 func (p *Pipeline) RequiresPreInsert() bool {
 	for _, task := range p.Tasks {
 		switch task.Type() {
-		case TaskTypeBridge:
-			if task.(*BridgeTask).Async == "true" {
-				return true
-			}
 		case TaskTypeETHTx:
 			// we want to pre-insert pipeline_task_runs always
 			return true

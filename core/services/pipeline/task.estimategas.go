@@ -17,6 +17,8 @@ import (
 	"github.com/smartcontractkit/chainlink/v2/core/logger"
 )
 
+var ErrMultiplyOverlow = errors.New("multiply overflow")
+
 // Return types:
 //
 //	uint64

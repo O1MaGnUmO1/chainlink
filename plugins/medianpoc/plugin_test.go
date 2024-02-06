@@ -93,7 +93,6 @@ func TestNewPlugin(t *testing.T) {
 
 	f, err := p.newFactory(
 		tests.Context(t),
-		config,
 		prov,
 		pr,
 		nil,
