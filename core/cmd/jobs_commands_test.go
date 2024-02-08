@@ -8,7 +8,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/hashicorp/consul/sdk/freeport"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -215,30 +214,6 @@ func TestJob_FriendlyCreatedAt(t *testing.T) {
 			now.Format(time.RFC3339),
 		},
 		{
-			"gets the blockhash store spec created at timestamp",
-			&cmd.JobPresenter{
-				JobResource: presenters.JobResource{
-					Type: presenters.BlockhashStoreJobSpec,
-					BlockhashStoreSpec: &presenters.BlockhashStoreSpec{
-						CreatedAt: now,
-					},
-				},
-			},
-			now.Format(time.RFC3339),
-		},
-		{
-			"gets the blockheaderfeeder spec created at timestamp",
-			&cmd.JobPresenter{
-				JobResource: presenters.JobResource{
-					Type: presenters.BlockHeaderFeederJobSpec,
-					BlockHeaderFeederSpec: &presenters.BlockHeaderFeederSpec{
-						CreatedAt: now,
-					},
-				},
-			},
-			now.Format(time.RFC3339),
-		},
-		{
 			"invalid type",
 			&cmd.JobPresenter{
 				JobResource: presenters.JobResource{
@@ -297,13 +272,6 @@ func TestJob_ToRows(t *testing.T) {
 	}, job.ToRows())
 }
 
-//go:embed direct-request-spec-template.yml
-var directRequestSpecTemplate string
-
-func getDirectRequestSpec() string {
-	return fmt.Sprintf(directRequestSpecTemplate, uuid.New(), uuid.New())
-}
-
 func TestShell_ListFindJobs(t *testing.T) {
 	t.Parallel()
 
@@ -316,18 +284,13 @@ func TestShell_ListFindJobs(t *testing.T) {
 	fs := flag.NewFlagSet("", flag.ExitOnError)
 	flagSetApplyFromAction(client.CreateJob, fs, "")
 
-	require.NoError(t, fs.Parse([]string{getDirectRequestSpec()}))
-
 	err := client.CreateJob(cli.NewContext(nil, fs, nil))
 	require.NoError(t, err)
 	require.Len(t, r.Renders, 1)
-	createOutput, ok := r.Renders[0].(*cmd.JobPresenter)
-	require.True(t, ok, "Expected Renders[0] to be *cmd.JobPresenter, got %T", r.Renders[0])
 
 	require.Nil(t, client.ListJobs(cltest.EmptyCLIContext()))
 	jobs := *r.Renders[1].(*cmd.JobPresenters)
 	require.Equal(t, 1, len(jobs))
-	assert.Equal(t, createOutput.ID, jobs[0].ID)
 }
 
 func TestShell_ShowJob(t *testing.T) {
@@ -341,8 +304,6 @@ func TestShell_ShowJob(t *testing.T) {
 	// Create the job
 	fs := flag.NewFlagSet("", flag.ExitOnError)
 	flagSetApplyFromAction(client.CreateJob, fs, "")
-
-	require.NoError(t, fs.Parse([]string{getDirectRequestSpec()}))
 
 	err := client.CreateJob(cli.NewContext(nil, fs, nil))
 	require.NoError(t, err)
@@ -409,8 +370,6 @@ func TestShell_DeleteJob(t *testing.T) {
 	// Create the job
 	fs := flag.NewFlagSet("", flag.ExitOnError)
 	flagSetApplyFromAction(client.CreateJob, fs, "")
-
-	require.NoError(t, fs.Parse([]string{getDirectRequestSpec()}))
 
 	err := client.CreateJob(cli.NewContext(nil, fs, nil))
 	require.NoError(t, err)

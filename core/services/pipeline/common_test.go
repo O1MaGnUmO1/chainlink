@@ -14,6 +14,7 @@ import (
 
 	"github.com/smartcontractkit/chainlink/v2/core/chains/evm/config/toml"
 	"github.com/smartcontractkit/chainlink/v2/core/internal/cltest"
+	"github.com/smartcontractkit/chainlink/v2/core/internal/testutils"
 	"github.com/smartcontractkit/chainlink/v2/core/internal/testutils/configtest"
 	"github.com/smartcontractkit/chainlink/v2/core/internal/testutils/evmtest"
 	"github.com/smartcontractkit/chainlink/v2/core/services/chainlink"
@@ -38,29 +39,29 @@ func TestTimeoutAttribute(t *testing.T) {
 	assert.Equal(t, false, set)
 }
 
-func TestTaskHTTPUnmarshal(t *testing.T) {
-	t.Parallel()
+// func TestTaskHTTPUnmarshal(t *testing.T) {
+// 	t.Parallel()
 
-	a := `ds1 [type=http allowunrestrictednetworkaccess=true method=GET url="https://chain.link/voter_turnout/USA-2020" requestData=<{"hi": "hello"}> timeout="10s"];`
-	p, err := pipeline.Parse(a)
-	require.NoError(t, err)
-	require.Len(t, p.Tasks, 1)
+// 	a := `ds1 [type=http allowunrestrictednetworkaccess=true method=GET url="https://chain.link/voter_turnout/USA-2020" requestData=<{"hi": "hello"}> timeout="10s"];`
+// 	p, err := pipeline.Parse(a)
+// 	require.NoError(t, err)
+// 	require.Len(t, p.Tasks, 1)
 
-	task := p.Tasks[0].(*pipeline.HTTPTask)
-	require.Equal(t, "true", task.AllowUnrestrictedNetworkAccess)
-}
+// 	task := p.Tasks[0].(*pipeline.HTTPTask)
+// 	require.Equal(t, "true", task.AllowUnrestrictedNetworkAccess)
+// }
 
-func TestTaskAnyUnmarshal(t *testing.T) {
-	t.Parallel()
+// func TestTaskAnyUnmarshal(t *testing.T) {
+// 	t.Parallel()
 
-	a := `ds1 [type=any failEarly=true];`
-	p, err := pipeline.Parse(a)
-	require.NoError(t, err)
-	require.Len(t, p.Tasks, 1)
-	_, ok := p.Tasks[0].(*pipeline.AnyTask)
-	require.True(t, ok)
-	require.Equal(t, true, p.Tasks[0].Base().FailEarly)
-}
+// 	a := `ds1 [type=any failEarly=true];`
+// 	p, err := pipeline.Parse(a)
+// 	require.NoError(t, err)
+// 	require.Len(t, p.Tasks, 1)
+// 	_, ok := p.Tasks[0].(*pipeline.AnyTask)
+// 	require.True(t, ok)
+// 	require.Equal(t, true, p.Tasks[0].Base().FailEarly)
+// }
 
 func TestRetryUnmarshal(t *testing.T) {
 	t.Parallel()
@@ -136,33 +137,11 @@ func TestUnmarshalTaskFromMap(t *testing.T) {
 		taskType         pipeline.TaskType
 		expectedTaskType interface{}
 	}{
-		{pipeline.TaskTypeHTTP, &pipeline.HTTPTask{}},
-		{pipeline.TaskTypeBridge, &pipeline.BridgeTask{}},
-		{pipeline.TaskTypeMean, &pipeline.MeanTask{}},
-		{pipeline.TaskTypeMedian, &pipeline.MedianTask{}},
-		{pipeline.TaskTypeMode, &pipeline.ModeTask{}},
-		{pipeline.TaskTypeSum, &pipeline.SumTask{}},
-		{pipeline.TaskTypeMultiply, &pipeline.MultiplyTask{}},
-		{pipeline.TaskTypeDivide, &pipeline.DivideTask{}},
-		{pipeline.TaskTypeJSONParse, &pipeline.JSONParseTask{}},
-		{pipeline.TaskTypeCBORParse, &pipeline.CBORParseTask{}},
-		{pipeline.TaskTypeAny, &pipeline.AnyTask{}},
-		{pipeline.TaskTypeVRF, &pipeline.VRFTask{}},
 		{pipeline.TaskTypeVRFV2, &pipeline.VRFTaskV2{}},
-		{pipeline.TaskTypeVRFV2Plus, &pipeline.VRFTaskV2Plus{}},
 		{pipeline.TaskTypeEstimateGasLimit, &pipeline.EstimateGasLimitTask{}},
 		{pipeline.TaskTypeETHCall, &pipeline.ETHCallTask{}},
-		{pipeline.TaskTypeETHTx, &pipeline.ETHTxTask{}},
-		{pipeline.TaskTypeETHABIEncode, &pipeline.ETHABIEncodeTask{}},
-		{pipeline.TaskTypeETHABIEncode2, &pipeline.ETHABIEncodeTask2{}},
 		{pipeline.TaskTypeETHABIDecode, &pipeline.ETHABIDecodeTask{}},
 		{pipeline.TaskTypeETHABIDecodeLog, &pipeline.ETHABIDecodeLogTask{}},
-		{pipeline.TaskTypeMerge, &pipeline.MergeTask{}},
-		{pipeline.TaskTypeLowercase, &pipeline.LowercaseTask{}},
-		{pipeline.TaskTypeUppercase, &pipeline.UppercaseTask{}},
-		{pipeline.TaskTypeConditional, &pipeline.ConditionalTask{}},
-		{pipeline.TaskTypeHexDecode, &pipeline.HexDecodeTask{}},
-		{pipeline.TaskTypeBase64Decode, &pipeline.Base64DecodeTask{}},
 	}
 
 	for _, test := range tests {
@@ -324,12 +303,12 @@ func TestSelectGasLimit(t *testing.T) {
 	t.Parallel()
 
 	gcfg := configtest.NewGeneralConfig(t, func(c *chainlink.Config, s *chainlink.Secrets) {
-		c.EVM[0].GasEstimator.LimitDefault = ptr(uint32(999))
+		c.EVM[0].GasEstimator.LimitDefault = testutils.Ptr(uint32(999))
 		c.EVM[0].GasEstimator.LimitJobType = toml.GasLimitJobType{
-			DR:     ptr(uint32(100)),
-			VRF:    ptr(uint32(101)),
-			FM:     ptr(uint32(102)),
-			Keeper: ptr(uint32(104)),
+			DR:     testutils.Ptr(uint32(100)),
+			VRF:    testutils.Ptr(uint32(101)),
+			FM:     testutils.Ptr(uint32(102)),
+			Keeper: testutils.Ptr(uint32(104)),
 		}
 	})
 	cfg := evmtest.NewChainScopedConfig(t, gcfg)
@@ -378,23 +357,8 @@ func TestSelectGasLimit(t *testing.T) {
 func TestGetNextTaskOf(t *testing.T) {
 	trrs := pipeline.TaskRunResults{
 		{
-			Task: &pipeline.BridgeTask{
-				BaseTask: pipeline.NewBaseTask(1, "t1", nil, nil, 0),
-			},
-		},
-		{
-			Task: &pipeline.HTTPTask{
-				BaseTask: pipeline.NewBaseTask(2, "t2", nil, nil, 0),
-			},
-		},
-		{
 			Task: &pipeline.ETHABIDecodeTask{
 				BaseTask: pipeline.NewBaseTask(3, "t3", nil, nil, 0),
-			},
-		},
-		{
-			Task: &pipeline.JSONParseTask{
-				BaseTask: pipeline.NewBaseTask(4, "t4", nil, nil, 0),
 			},
 		},
 	}

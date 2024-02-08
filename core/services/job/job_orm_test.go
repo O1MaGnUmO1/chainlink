@@ -15,11 +15,9 @@ import (
 	"github.com/smartcontractkit/chainlink/v2/core/chains/evm/assets"
 	"github.com/smartcontractkit/chainlink/v2/core/internal/cltest"
 	"github.com/smartcontractkit/chainlink/v2/core/internal/testutils/configtest"
-	"github.com/smartcontractkit/chainlink/v2/core/internal/testutils/evmtest"
 	"github.com/smartcontractkit/chainlink/v2/core/internal/testutils/pgtest"
 	"github.com/smartcontractkit/chainlink/v2/core/logger"
 	"github.com/smartcontractkit/chainlink/v2/core/services/job"
-	"github.com/smartcontractkit/chainlink/v2/core/services/keeper"
 	"github.com/smartcontractkit/chainlink/v2/core/services/keystore/keys/ethkey"
 	"github.com/smartcontractkit/chainlink/v2/core/services/pipeline"
 	"github.com/smartcontractkit/chainlink/v2/core/services/vrf/vrfcommon"
@@ -226,25 +224,6 @@ func TestORM_DeleteJob_DeletesAssociatedRecords(t *testing.T) {
 	pipelineORM := pipeline.NewORM(db, lggr, config.Database(), config.JobPipeline().MaxSuccessfulRuns())
 	bridgesORM := bridges.NewORM(db, lggr, config.Database())
 	jobORM := NewTestORM(t, db, pipelineORM, bridgesORM, keyStore, config.Database())
-	scopedConfig := evmtest.NewChainScopedConfig(t, config)
-	korm := keeper.NewORM(db, logger.TestLogger(t), scopedConfig.Database())
-
-	t.Run("it deletes records for keeper jobs", func(t *testing.T) {
-		registry, keeperJob := cltest.MustInsertKeeperRegistry(t, db, korm, keyStore.Eth(), 0, 1, 20)
-		scoped := evmtest.NewChainScopedConfig(t, config)
-		cltest.MustInsertUpkeepForRegistry(t, db, scoped.Database(), registry)
-
-		cltest.AssertCount(t, db, "keeper_specs", 1)
-		cltest.AssertCount(t, db, "keeper_registries", 1)
-		cltest.AssertCount(t, db, "upkeep_registrations", 1)
-
-		err := jobORM.DeleteJob(keeperJob.ID)
-		require.NoError(t, err)
-		cltest.AssertCount(t, db, "keeper_specs", 0)
-		cltest.AssertCount(t, db, "keeper_registries", 0)
-		cltest.AssertCount(t, db, "upkeep_registrations", 0)
-		cltest.AssertCount(t, db, "jobs", 0)
-	})
 
 	t.Run("it creates and deletes records for vrf jobs", func(t *testing.T) {
 		key, err := keyStore.VRF().Create()

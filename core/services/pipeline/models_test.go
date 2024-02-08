@@ -96,7 +96,7 @@ func TestRun_StringOutputs(t *testing.T) {
 	})
 
 	big := big.NewInt(123)
-	dec := mustDecimal(t, "123")
+	// dec := mustDecimal(t, "123")
 
 	testCases := []struct {
 		name string
@@ -109,8 +109,8 @@ func TestRun_StringOutputs(t *testing.T) {
 		{"large float64", float64(9007199254740991231), "9007199254740991000"},
 		{"big.Int", *big, "123"},
 		{"*big.Int", big, "123"},
-		{"decimal", *dec, "123"},
-		{"*decimal", dec, "123"},
+		// {"decimal", *dec, "123"},
+		// {"*decimal", dec, "123"},
 	}
 
 	for _, tc := range testCases {

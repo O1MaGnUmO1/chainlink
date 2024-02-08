@@ -317,65 +317,9 @@ func (_m *ChainScopedConfig) LogConfiguration(log coreconfig.LogfFn, warn coreco
 	_m.Called(log, warn)
 }
 
-// Mercury provides a mock function with given fields:
-func (_m *ChainScopedConfig) Mercury() coreconfig.Mercury {
-	ret := _m.Called()
-
-	if len(ret) == 0 {
-		panic("no return value specified for Mercury")
-	}
-
-	var r0 coreconfig.Mercury
-	if rf, ok := ret.Get(0).(func() coreconfig.Mercury); ok {
-		r0 = rf()
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(coreconfig.Mercury)
-		}
-	}
-
-	return r0
-}
 
 // OCR provides a mock function with given fields:
-func (_m *ChainScopedConfig) OCR() coreconfig.OCR {
-	ret := _m.Called()
 
-	if len(ret) == 0 {
-		panic("no return value specified for OCR")
-	}
-
-	var r0 coreconfig.OCR
-	if rf, ok := ret.Get(0).(func() coreconfig.OCR); ok {
-		r0 = rf()
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(coreconfig.OCR)
-		}
-	}
-
-	return r0
-}
-
-// OCR2 provides a mock function with given fields:
-func (_m *ChainScopedConfig) OCR2() coreconfig.OCR2 {
-	ret := _m.Called()
-
-	if len(ret) == 0 {
-		panic("no return value specified for OCR2")
-	}
-
-	var r0 coreconfig.OCR2
-	if rf, ok := ret.Get(0).(func() coreconfig.OCR2); ok {
-		r0 = rf()
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(coreconfig.OCR2)
-		}
-	}
-
-	return r0
-}
 
 // P2P provides a mock function with given fields:
 func (_m *ChainScopedConfig) P2P() coreconfig.P2P {

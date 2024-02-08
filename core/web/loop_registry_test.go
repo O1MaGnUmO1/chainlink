@@ -80,7 +80,6 @@ func TestLoopRegistry(t *testing.T) {
 		model.LabelSet{"__metrics_path__": model.LabelValue(expectedLooppEndPoint)},
 	}
 
-	require.NoError(t, app.KeyStore.OCR().Add(cltest.DefaultOCRKey))
 	require.NoError(t, app.Start(testutils.Context(t)))
 
 	// register a mock loop

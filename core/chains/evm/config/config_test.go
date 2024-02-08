@@ -289,27 +289,6 @@ func TestChainScopedConfig_GasEstimator(t *testing.T) {
 	assert.Equal(t, assets.NewWeiI(1), ge.TipCapMin())
 }
 
-func TestChainScopedConfig_BSCDefaults(t *testing.T) {
-	chainID := big.NewInt(56)
-	gcfg := configtest.NewGeneralConfig(t, func(c *chainlink.Config, secrets *chainlink.Secrets) {
-		id := ubig.New(chainID)
-		cfg := toml.Defaults(id)
-		c.EVM[0] = &toml.EVMConfig{
-			ChainID: id,
-			Enabled: ptr(true),
-			Chain:   cfg,
-		}
-	})
-	cfg := evmtest.NewChainScopedConfig(t, gcfg)
-
-	timeout := cfg.EVM().OCR().DatabaseTimeout()
-	require.Equal(t, 2*time.Second, timeout)
-	timeout = cfg.EVM().OCR().ContractTransmitterTransmitTimeout()
-	require.Equal(t, 2*time.Second, timeout)
-	timeout = cfg.EVM().OCR().ObservationGracePeriod()
-	require.Equal(t, 500*time.Millisecond, timeout)
-}
-
 func TestChainScopedConfig_Profiles(t *testing.T) {
 	t.Parallel()
 
@@ -355,7 +334,6 @@ func TestChainScopedConfig_Profiles(t *testing.T) {
 			config := evmtest.NewChainScopedConfig(t, gcfg)
 
 			assert.Equal(t, tt.expectedGasLimitDefault, config.EVM().GasEstimator().LimitDefault())
-			assert.Nil(t, config.EVM().GasEstimator().LimitJobType().OCR())
 			assert.Nil(t, config.EVM().GasEstimator().LimitJobType().DR())
 			assert.Nil(t, config.EVM().GasEstimator().LimitJobType().VRF())
 			assert.Nil(t, config.EVM().GasEstimator().LimitJobType().FM())

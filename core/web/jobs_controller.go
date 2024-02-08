@@ -13,10 +13,10 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/smartcontractkit/chainlink/v2/core/logger/audit"
+	"github.com/smartcontractkit/chainlink/v2/core/services/blockhashstore"
 	"github.com/smartcontractkit/chainlink/v2/core/services/chainlink"
 	"github.com/smartcontractkit/chainlink/v2/core/services/gateway"
 	"github.com/smartcontractkit/chainlink/v2/core/services/job"
-	"github.com/smartcontractkit/chainlink/v2/core/services/keeper"
 	"github.com/smartcontractkit/chainlink/v2/core/services/keystore"
 	"github.com/smartcontractkit/chainlink/v2/core/services/pg"
 	"github.com/smartcontractkit/chainlink/v2/core/services/vrf/vrfcommon"
@@ -210,8 +210,8 @@ func (jc *JobsController) validateJobSpec(tomlString string) (jb job.Job, status
 		return jb, http.StatusUnprocessableEntity, errors.Wrap(err, "failed to parse TOML")
 	}
 	switch jobType {
-	case job.Keeper:
-		jb, err = keeper.ValidatedKeeperSpec(tomlString)
+	case job.BlockhashStore:
+		jb, err = blockhashstore.ValidatedSpec(tomlString)
 	case job.VRF:
 		jb, err = vrfcommon.ValidatedVRFSpec(tomlString)
 	case job.Webhook:

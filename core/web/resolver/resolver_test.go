@@ -41,14 +41,11 @@ type mocks struct {
 	pipelineORM          *pipelineMocks.ORM
 	cfg                  *chainlinkMocks.GeneralConfig
 	scfg                 *evmConfigMocks.ChainScopedConfig
-	ocr                  *keystoreMocks.OCR
-	ocr2                 *keystoreMocks.OCR2
 	csa                  *keystoreMocks.CSA
 	keystore             *keystoreMocks.Master
 	ethKs                *keystoreMocks.Eth
 	p2p                  *keystoreMocks.P2P
 	vrf                  *keystoreMocks.VRF
-	solana               *keystoreMocks.Solana
 	chain                *legacyEvmORMMocks.Chain
 	legacyEVMChains      *legacyEvmORMMocks.LegacyChainContainer
 	relayerChainInterops *chainlinkMocks.FakeRelayerChainInteroperators
@@ -99,14 +96,11 @@ func setupFramework(t *testing.T) *gqlTestFramework {
 		pipelineORM:          pipelineMocks.NewORM(t),
 		cfg:                  chainlinkMocks.NewGeneralConfig(t),
 		scfg:                 evmConfigMocks.NewChainScopedConfig(t),
-		ocr:                  keystoreMocks.NewOCR(t),
-		ocr2:                 keystoreMocks.NewOCR2(t),
 		csa:                  keystoreMocks.NewCSA(t),
 		keystore:             keystoreMocks.NewMaster(t),
 		ethKs:                keystoreMocks.NewEth(t),
 		p2p:                  keystoreMocks.NewP2P(t),
 		vrf:                  keystoreMocks.NewVRF(t),
-		solana:               keystoreMocks.NewSolana(t),
 		chain:                legacyEvmORMMocks.NewChain(t),
 		legacyEVMChains:      legacyEvmORMMocks.NewLegacyChainContainer(t),
 		relayerChainInterops: &chainlinkMocks.FakeRelayerChainInteroperators{},

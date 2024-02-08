@@ -11,16 +11,11 @@ import (
 	"github.com/jmoiron/sqlx"
 
 	"github.com/smartcontractkit/chainlink/v2/core/logger"
-	"github.com/smartcontractkit/chainlink/v2/core/services/keystore/keys/cosmoskey"
 	"github.com/smartcontractkit/chainlink/v2/core/services/keystore/keys/csakey"
 	"github.com/smartcontractkit/chainlink/v2/core/services/keystore/keys/dkgencryptkey"
 	"github.com/smartcontractkit/chainlink/v2/core/services/keystore/keys/dkgsignkey"
 	"github.com/smartcontractkit/chainlink/v2/core/services/keystore/keys/ethkey"
-	"github.com/smartcontractkit/chainlink/v2/core/services/keystore/keys/ocr2key"
-	"github.com/smartcontractkit/chainlink/v2/core/services/keystore/keys/ocrkey"
 	"github.com/smartcontractkit/chainlink/v2/core/services/keystore/keys/p2pkey"
-	"github.com/smartcontractkit/chainlink/v2/core/services/keystore/keys/solkey"
-	"github.com/smartcontractkit/chainlink/v2/core/services/keystore/keys/starkkey"
 	"github.com/smartcontractkit/chainlink/v2/core/services/keystore/keys/vrfkey"
 	"github.com/smartcontractkit/chainlink/v2/core/services/pg"
 	"github.com/smartcontractkit/chainlink/v2/core/utils"
@@ -223,22 +218,12 @@ func (km *keyManager) isLocked() bool {
 
 func GetFieldNameForKey(unknownKey Key) (string, error) {
 	switch unknownKey.(type) {
-	case cosmoskey.Key:
-		return "Cosmos", nil
 	case csakey.KeyV2:
 		return "CSA", nil
 	case ethkey.KeyV2:
 		return "Eth", nil
-	case ocrkey.KeyV2:
-		return "OCR", nil
-	case ocr2key.KeyBundle:
-		return "OCR2", nil
 	case p2pkey.KeyV2:
 		return "P2P", nil
-	case solkey.Key:
-		return "Solana", nil
-	case starkkey.Key:
-		return "StarkNet", nil
 	case vrfkey.KeyV2:
 		return "VRF", nil
 	case dkgsignkey.Key:

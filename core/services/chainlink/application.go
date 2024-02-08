@@ -22,6 +22,7 @@ import (
 	commonservices "github.com/O1MaGnUmO1/chainlink-common/pkg/services"
 	"github.com/O1MaGnUmO1/chainlink-common/pkg/utils"
 	"github.com/O1MaGnUmO1/chainlink-common/pkg/utils/mailbox"
+	"github.com/smartcontractkit/chainlink/v2/core/services/blockhashstore"
 	"github.com/smartcontractkit/chainlink/v2/core/static"
 
 	"github.com/smartcontractkit/chainlink/v2/core/bridges"
@@ -35,7 +36,6 @@ import (
 	"github.com/smartcontractkit/chainlink/v2/core/services"
 	"github.com/smartcontractkit/chainlink/v2/core/services/gateway"
 	"github.com/smartcontractkit/chainlink/v2/core/services/job"
-	"github.com/smartcontractkit/chainlink/v2/core/services/keeper"
 	"github.com/smartcontractkit/chainlink/v2/core/services/keystore"
 	"github.com/smartcontractkit/chainlink/v2/core/services/periodicbackup"
 	"github.com/smartcontractkit/chainlink/v2/core/services/pg"
@@ -283,13 +283,6 @@ func NewApplication(opts ApplicationOpts) (Application, error) {
 
 	var (
 		delegates = map[job.Type]job.Delegate{
-			job.Keeper: keeper.NewDelegate(
-				db,
-				jobORM,
-				pipelineRunner,
-				globalLogger,
-				legacyEVMChains,
-				mailMon),
 			job.VRF: vrf.NewDelegate(
 				db,
 				keyStore,
@@ -299,6 +292,10 @@ func NewApplication(opts ApplicationOpts) (Application, error) {
 				globalLogger,
 				cfg.Database(),
 				mailMon),
+			job.BlockhashStore: blockhashstore.NewDelegate(
+				globalLogger,
+				legacyEVMChains,
+				keyStore.Eth()),
 			job.Webhook: webhook.NewDelegate(
 				pipelineRunner,
 				externalInitiatorManager,
