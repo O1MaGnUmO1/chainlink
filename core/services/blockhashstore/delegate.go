@@ -11,10 +11,8 @@ import (
 	"github.com/O1MaGnUmO1/chainlink-common/pkg/services"
 	"github.com/smartcontractkit/chainlink/v2/core/chains/legacyevm"
 	"github.com/smartcontractkit/chainlink/v2/core/gethwrappers/generated/blockhash_store"
-	v1 "github.com/smartcontractkit/chainlink/v2/core/gethwrappers/generated/solidity_vrf_coordinator_interface"
 	"github.com/smartcontractkit/chainlink/v2/core/gethwrappers/generated/trusted_blockhash_store"
 	v2 "github.com/smartcontractkit/chainlink/v2/core/gethwrappers/generated/vrf_coordinator_v2"
-	v2plus "github.com/smartcontractkit/chainlink/v2/core/gethwrappers/generated/vrf_coordinator_v2plus_interface"
 	"github.com/smartcontractkit/chainlink/v2/core/logger"
 	"github.com/smartcontractkit/chainlink/v2/core/services/job"
 	"github.com/smartcontractkit/chainlink/v2/core/services/keystore"
@@ -98,21 +96,6 @@ func (d *Delegate) ServicesForSpec(jb job.Job) ([]job.ServiceCtx, error) {
 
 	lp := chain.LogPoller()
 	var coordinators []Coordinator
-	if jb.BlockhashStoreSpec.CoordinatorV1Address != nil {
-		var c *v1.VRFCoordinator
-		if c, err = v1.NewVRFCoordinator(
-			jb.BlockhashStoreSpec.CoordinatorV1Address.Address(), chain.Client()); err != nil {
-
-			return nil, errors.Wrap(err, "building V1 coordinator")
-		}
-
-		var coord *V1Coordinator
-		coord, err = NewV1Coordinator(c, lp)
-		if err != nil {
-			return nil, errors.Wrap(err, "building V1 coordinator")
-		}
-		coordinators = append(coordinators, coord)
-	}
 	if jb.BlockhashStoreSpec.CoordinatorV2Address != nil {
 		var c *v2.VRFCoordinatorV2
 		if c, err = v2.NewVRFCoordinatorV2(
@@ -125,21 +108,6 @@ func (d *Delegate) ServicesForSpec(jb job.Job) ([]job.ServiceCtx, error) {
 		coord, err = NewV2Coordinator(c, lp)
 		if err != nil {
 			return nil, errors.Wrap(err, "building V2 coordinator")
-		}
-		coordinators = append(coordinators, coord)
-	}
-	if jb.BlockhashStoreSpec.CoordinatorV2PlusAddress != nil {
-		var c v2plus.IVRFCoordinatorV2PlusInternalInterface
-		if c, err = v2plus.NewIVRFCoordinatorV2PlusInternal(
-			jb.BlockhashStoreSpec.CoordinatorV2PlusAddress.Address(), chain.Client()); err != nil {
-
-			return nil, errors.Wrap(err, "building V2Plus coordinator")
-		}
-
-		var coord *V2PlusCoordinator
-		coord, err = NewV2PlusCoordinator(c, lp)
-		if err != nil {
-			return nil, errors.Wrap(err, "building V2Plus coordinator")
 		}
 		coordinators = append(coordinators, coord)
 	}

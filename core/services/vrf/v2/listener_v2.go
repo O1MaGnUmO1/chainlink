@@ -21,9 +21,7 @@ import (
 	evmtypes "github.com/smartcontractkit/chainlink/v2/core/chains/evm/types"
 	"github.com/smartcontractkit/chainlink/v2/core/chains/legacyevm"
 	"github.com/smartcontractkit/chainlink/v2/core/gethwrappers/generated/batch_vrf_coordinator_v2"
-	"github.com/smartcontractkit/chainlink/v2/core/gethwrappers/generated/batch_vrf_coordinator_v2plus"
 	"github.com/smartcontractkit/chainlink/v2/core/gethwrappers/generated/vrf_coordinator_v2"
-	"github.com/smartcontractkit/chainlink/v2/core/gethwrappers/generated/vrf_coordinator_v2plus_interface"
 	"github.com/smartcontractkit/chainlink/v2/core/gethwrappers/generated/vrf_owner"
 	"github.com/smartcontractkit/chainlink/v2/core/logger"
 	"github.com/smartcontractkit/chainlink/v2/core/services/job"
@@ -34,12 +32,10 @@ import (
 )
 
 var (
-	_                         job.ServiceCtx = &listenerV2{}
-	coordinatorV2ABI                         = evmtypes.MustGetABI(vrf_coordinator_v2.VRFCoordinatorV2ABI)
-	coordinatorV2PlusABI                     = evmtypes.MustGetABI(vrf_coordinator_v2plus_interface.IVRFCoordinatorV2PlusInternalABI)
-	batchCoordinatorV2ABI                    = evmtypes.MustGetABI(batch_vrf_coordinator_v2.BatchVRFCoordinatorV2ABI)
-	batchCoordinatorV2PlusABI                = evmtypes.MustGetABI(batch_vrf_coordinator_v2plus.BatchVRFCoordinatorV2PlusABI)
-	vrfOwnerABI                              = evmtypes.MustGetABI(vrf_owner.VRFOwnerMetaData.ABI)
+	_                     job.ServiceCtx = &listenerV2{}
+	coordinatorV2ABI                     = evmtypes.MustGetABI(vrf_coordinator_v2.VRFCoordinatorV2ABI)
+	batchCoordinatorV2ABI                = evmtypes.MustGetABI(batch_vrf_coordinator_v2.BatchVRFCoordinatorV2ABI)
+	vrfOwnerABI                          = evmtypes.MustGetABI(vrf_owner.VRFOwnerMetaData.ABI)
 	// These are the transaction states used when summing up already reserved subscription funds that are about to be used in in-flight transactions
 	reserveEthLinkQueryStates = []txmgrtypes.TxState{txmgrcommon.TxUnconfirmed, txmgrcommon.TxUnstarted, txmgrcommon.TxInProgress}
 )

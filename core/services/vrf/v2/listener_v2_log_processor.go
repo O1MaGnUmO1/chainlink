@@ -26,7 +26,6 @@ import (
 	"github.com/smartcontractkit/chainlink/v2/core/chains/evm/assets"
 	"github.com/smartcontractkit/chainlink/v2/core/chains/evm/txmgr"
 	"github.com/smartcontractkit/chainlink/v2/core/gethwrappers/generated/vrf_coordinator_v2"
-	"github.com/smartcontractkit/chainlink/v2/core/gethwrappers/generated/vrf_coordinator_v2plus_interface"
 	"github.com/smartcontractkit/chainlink/v2/core/logger"
 	"github.com/smartcontractkit/chainlink/v2/core/services/pg"
 	"github.com/smartcontractkit/chainlink/v2/core/services/pipeline"
@@ -947,9 +946,7 @@ func (lsn *listenerV2) processRequestsPerSub(
 }
 
 func (lsn *listenerV2) requestCommitmentPayload(requestID *big.Int) (payload []byte, err error) {
-	if lsn.coordinator.Version() == vrfcommon.V2Plus {
-		return coordinatorV2PlusABI.Pack("s_requestCommitments", requestID)
-	} else if lsn.coordinator.Version() == vrfcommon.V2 {
+	if lsn.coordinator.Version() == vrfcommon.V2 {
 		return coordinatorV2ABI.Pack("getCommitment", requestID)
 	}
 	return nil, errors.Errorf("unsupported coordinator version: %s", lsn.coordinator.Version())
@@ -1198,14 +1195,6 @@ func (lsn *listenerV2) simulateFulfillment(
 			res.proof = FromV2Proof(m["proof"].(vrf_coordinator_v2.VRFProof))
 			res.reqCommitment = NewRequestCommitment(m["requestCommitment"])
 		}
-
-		if trr.Task.Type() == pipeline.TaskTypeVRFV2Plus {
-			m := trr.Result.Value.(map[string]interface{})
-			res.payload = m["output"].(string)
-			res.proof = FromV2PlusProof(m["proof"].(vrf_coordinator_v2plus_interface.IVRFCoordinatorV2PlusInternalProof))
-			res.reqCommitment = NewRequestCommitment(m["requestCommitment"])
-		}
-
 		if trr.Task.Type() == pipeline.TaskTypeEstimateGasLimit {
 			res.gasLimit = trr.Result.Value.(uint32)
 		}

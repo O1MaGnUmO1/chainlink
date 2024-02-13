@@ -22,7 +22,6 @@ import (
 	"github.com/smartcontractkit/chainlink/v2/core/chains/evm/utils/big"
 	"github.com/smartcontractkit/chainlink/v2/core/gethwrappers/generated/authorized_forwarder"
 	"github.com/smartcontractkit/chainlink/v2/core/gethwrappers/generated/authorized_receiver"
-	"github.com/smartcontractkit/chainlink/v2/core/gethwrappers/generated/offchain_aggregator_wrapper"
 	"github.com/smartcontractkit/chainlink/v2/core/services/pg"
 )
 
@@ -46,8 +45,7 @@ type FwdMgr struct {
 	sendersCache map[common.Address][]common.Address
 	latestBlock  int64
 
-	authRcvr    authorized_receiver.AuthorizedReceiverInterface
-	offchainAgg offchain_aggregator_wrapper.OffchainAggregatorInterface
+	authRcvr authorized_receiver.AuthorizedReceiverInterface
 
 	ctx    context.Context
 	cancel context.CancelFunc
@@ -94,11 +92,6 @@ func (f *FwdMgr) Start(ctx context.Context) error {
 		f.authRcvr, err = authorized_receiver.NewAuthorizedReceiver(common.Address{}, f.evmClient)
 		if err != nil {
 			return errors.Wrap(err, "Failed to init AuthorizedReceiver")
-		}
-
-		f.offchainAgg, err = offchain_aggregator_wrapper.NewOffchainAggregator(common.Address{}, f.evmClient)
-		if err != nil {
-			return errors.Wrap(err, "Failed to init OffchainAggregator")
 		}
 
 		f.wg.Add(1)
