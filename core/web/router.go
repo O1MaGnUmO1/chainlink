@@ -390,11 +390,6 @@ func v2Routes(app chainlink.Application, r *gin.RouterGroup) {
 			chains.GET(chain.path+"/:ID/nodes", paginatedRequest(chain.nc.Index))
 		}
 
-		efc := EVMForwardersController{app}
-		authv2.GET("/nodes/evm/forwarders", paginatedRequest(efc.Index))
-		authv2.POST("/nodes/evm/forwarders/track", auth.RequiresEditRole(efc.Track))
-		authv2.DELETE("/nodes/evm/forwarders/:fwdID", auth.RequiresEditRole(efc.Delete))
-
 		buildInfo := BuildInfoController{app}
 		authv2.GET("/build_info", buildInfo.Show)
 

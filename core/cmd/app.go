@@ -290,11 +290,6 @@ func NewApp(s *Shell) *cli.App {
 				initEVMNodeSubCmd(s),
 			},
 		},
-		{
-			Name:        "forwarders",
-			Usage:       "Commands for managing forwarder addresses.",
-			Subcommands: initFowardersSubCmds(s),
-		},
 	}...)
 	return app
 }
