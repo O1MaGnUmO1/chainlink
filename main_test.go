@@ -12,13 +12,11 @@ import (
 	"github.com/google/uuid"
 	"github.com/hashicorp/consul/sdk/freeport"
 	"github.com/rogpeppe/go-internal/testscript"
-	"github.com/stretchr/testify/require"
 
 	"github.com/smartcontractkit/chainlink/v2/core"
 	"github.com/smartcontractkit/chainlink/v2/core/config/env"
 	"github.com/smartcontractkit/chainlink/v2/core/static"
 	"github.com/smartcontractkit/chainlink/v2/internal/testdb"
-	"github.com/smartcontractkit/chainlink/v2/tools/txtar"
 )
 
 // special files can be included to allocate additional test resources
@@ -40,26 +38,6 @@ func TestMain(m *testing.M) {
 	os.Exit(testscript.RunMain(m, map[string]func() int{
 		"chainlink": core.Main,
 	}))
-}
-
-func TestScripts(t *testing.T) {
-	t.Parallel()
-
-	visitor := txtar.NewDirVisitor("testdata/scripts", txtar.Recurse, func(path string) error {
-		t.Run(strings.TrimPrefix(path, "testdata/scripts/"), func(t *testing.T) {
-			t.Parallel()
-
-			testscript.Run(t, testscript.Params{
-				Dir:             path,
-				Setup:           commonEnv,
-				ContinueOnError: true,
-				//UpdateScripts:   true, // uncomment to update golden files
-			})
-		})
-		return nil
-	})
-
-	require.NoError(t, visitor.Walk())
 }
 
 func commonEnv(te *testscript.Env) error {

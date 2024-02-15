@@ -33,7 +33,6 @@ import (
 	"github.com/smartcontractkit/chainlink/v2/core/chains/legacyevm"
 	"github.com/smartcontractkit/chainlink/v2/core/config"
 	"github.com/smartcontractkit/chainlink/v2/core/gethwrappers/generated"
-	"github.com/smartcontractkit/chainlink/v2/core/gethwrappers/generated/flux_aggregator_wrapper"
 	"github.com/smartcontractkit/chainlink/v2/core/internal/cltest"
 	"github.com/smartcontractkit/chainlink/v2/core/internal/testutils"
 	"github.com/smartcontractkit/chainlink/v2/core/internal/testutils/configtest"
@@ -130,10 +129,7 @@ func (helper *broadcasterHelper) start() {
 }
 
 func (helper *broadcasterHelper) register(listener log.Listener, contract log.AbigenContract, numConfirmations uint32) {
-	logs := []generated.AbigenLog{
-		flux_aggregator_wrapper.FluxAggregatorNewRound{},
-		flux_aggregator_wrapper.FluxAggregatorAnswerUpdated{},
-	}
+	logs := []generated.AbigenLog{}
 	helper.registerWithTopics(listener, contract, logs, numConfirmations)
 }
 

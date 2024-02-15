@@ -13,7 +13,6 @@ import (
 
 	"github.com/smartcontractkit/chainlink/v2/core/chains/evm/assets"
 	"github.com/smartcontractkit/chainlink/v2/core/gethwrappers/generated/link_token_interface"
-	"github.com/smartcontractkit/chainlink/v2/core/gethwrappers/generated/mock_v3_aggregator_contract"
 	"github.com/smartcontractkit/chainlink/v2/core/gethwrappers/generated/solidity_vrf_consumer_interface_v08"
 	"github.com/smartcontractkit/chainlink/v2/core/gethwrappers/generated/vrf_coordinator_mock"
 
@@ -88,13 +87,6 @@ func deployTransmissionUniverse(t *testing.T) *EntryPointUniverse {
 	require.NoError(t, err)
 	linkTokenAddress, _, linkToken, err := link_token_interface.DeployLinkToken(holder1, backend)
 	require.NoError(t, err)
-	linkEthFeedAddress, _, _, err := mock_v3_aggregator_contract.DeployMockV3AggregatorContract(
-		holder1,
-		backend,
-		18,
-		(*big.Int)(assets.GWei(5000000)), // .005 ETH
-	)
-	require.NoError(t, err)
 	vrfCoordinatorAddress, _, vrfCoordinator, err := vrf_coordinator_mock.DeployVRFCoordinatorMock(holder1, backend, linkTokenAddress)
 	require.NoError(t, err)
 	vrfConsumerAddress, _, _, err := solidity_vrf_consumer_interface_v08.DeployVRFConsumer(holder1, backend, vrfCoordinatorAddress, linkTokenAddress)
@@ -114,7 +106,6 @@ func deployTransmissionUniverse(t *testing.T) *EntryPointUniverse {
 		greeter:               greeter,
 		linkTokenAddress:      linkTokenAddress,
 		linkToken:             linkToken,
-		linkEthFeedAddress:    linkEthFeedAddress,
 		vrfCoordinatorAddress: vrfCoordinatorAddress,
 		vrfCoordinator:        vrfCoordinator,
 		vrfConsumerAddress:    vrfConsumerAddress,
@@ -266,13 +257,7 @@ func Test4337WithLinkTokenPaymaster(t *testing.T) {
 	// Deposit to LINK paymaster.
 	linkTokenAddress, _, linkToken, err := link_token_interface.DeployLinkToken(holder1, backend)
 	require.NoError(t, err)
-	linkEthFeedAddress, _, _, err := mock_v3_aggregator_contract.DeployMockV3AggregatorContract(
-		holder1,
-		backend,
-		18,
-		(*big.Int)(assets.GWei(5000000)), // .005 ETH
-	)
-	require.NoError(t, err)
+	linkEthFeedAddress := common.Address{}
 	paymasterAddress, _, _, err := paymaster_wrapper.DeployPaymaster(holder1, backend, linkTokenAddress, linkEthFeedAddress, universe.entryPointAddress)
 	require.NoError(t, err)
 	backend.Commit()

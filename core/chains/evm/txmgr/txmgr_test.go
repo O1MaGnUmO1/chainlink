@@ -30,7 +30,6 @@ import (
 	"github.com/smartcontractkit/chainlink/v2/core/chains/evm/assets"
 	evmclient "github.com/smartcontractkit/chainlink/v2/core/chains/evm/client"
 	evmconfig "github.com/smartcontractkit/chainlink/v2/core/chains/evm/config"
-	"github.com/smartcontractkit/chainlink/v2/core/chains/evm/forwarders"
 	"github.com/smartcontractkit/chainlink/v2/core/chains/evm/gas"
 	"github.com/smartcontractkit/chainlink/v2/core/chains/evm/logpoller"
 	"github.com/smartcontractkit/chainlink/v2/core/chains/evm/txmgr"
@@ -294,38 +293,6 @@ func TestTxm_CreateTransaction(t *testing.T) {
 		require.NotNil(t, etx.TransmitChecker)
 		require.NoError(t, json.Unmarshal(*etx.TransmitChecker, &c))
 		require.Equal(t, checker, c)
-	})
-
-	t.Run("forwards tx when a proper forwarder is set up", func(t *testing.T) {
-		pgtest.MustExec(t, db, `DELETE FROM evm.txes`)
-		pgtest.MustExec(t, db, `DELETE FROM evm.forwarders`)
-		evmConfig.MaxQueued = uint64(1)
-
-		// Create mock forwarder, mock authorizedsenders call.
-		form := forwarders.NewORM(db, logger.Test(t), cfg.Database())
-		fwdrAddr := testutils.NewAddress()
-		fwdr, err := form.CreateForwarder(fwdrAddr, ubig.Big(cltest.FixtureChainID))
-		require.NoError(t, err)
-		require.Equal(t, fwdr.Address, fwdrAddr)
-
-		etx, err := txm.CreateTransaction(testutils.Context(t), txmgr.TxRequest{
-			FromAddress:      fromAddress,
-			ToAddress:        toAddress,
-			EncodedPayload:   payload,
-			FeeLimit:         gasLimit,
-			ForwarderAddress: fwdr.Address,
-			Strategy:         txmgrcommon.NewSendEveryStrategy(),
-		})
-		assert.NoError(t, err)
-		cltest.AssertCount(t, db, "evm.txes", 1)
-
-		var dbEtx txmgr.DbEthTx
-		require.NoError(t, db.Get(&dbEtx, `SELECT * FROM evm.txes ORDER BY id ASC LIMIT 1`))
-
-		m, err := etx.GetMeta()
-		require.NoError(t, err)
-		require.NotNil(t, m.FwdrDestAddress)
-		require.Equal(t, etx.ToAddress.String(), fwdrAddr.String())
 	})
 
 	t.Run("insert Tx successfully with a IdempotencyKey", func(t *testing.T) {

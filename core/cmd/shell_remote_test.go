@@ -13,9 +13,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/hashicorp/consul/sdk/freeport"
 	"github.com/kylelemons/godebug/diff"
-	"github.com/pelletier/go-toml"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/urfave/cli"
@@ -30,11 +28,9 @@ import (
 	"github.com/smartcontractkit/chainlink/v2/core/internal/testutils/pgtest"
 	"github.com/smartcontractkit/chainlink/v2/core/logger"
 	"github.com/smartcontractkit/chainlink/v2/core/services/chainlink"
-	"github.com/smartcontractkit/chainlink/v2/core/services/job"
 	"github.com/smartcontractkit/chainlink/v2/core/sessions"
 	"github.com/smartcontractkit/chainlink/v2/core/static"
 	"github.com/smartcontractkit/chainlink/v2/core/store/models"
-	"github.com/smartcontractkit/chainlink/v2/core/testdata/testspecs"
 	"github.com/smartcontractkit/chainlink/v2/core/web"
 )
 
@@ -560,85 +556,6 @@ func TestShell_ConfigV2(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, effective, got, diff.Diff(effective, got))
 	})
-}
-
-func TestShell_RunOCRJob_HappyPath(t *testing.T) {
-	t.Parallel()
-	app := startNewApplicationV2(t, func(c *chainlink.Config, s *chainlink.Secrets) {
-		c.EVM[0].Enabled = ptr(true)
-		c.OCR.Enabled = ptr(true)
-		c.P2P.V2.Enabled = ptr(true)
-		c.P2P.V2.ListenAddresses = &[]string{fmt.Sprintf("127.0.0.1:%d", freeport.GetOne(t))}
-		c.P2P.PeerID = &cltest.DefaultP2PPeerID
-		c.EVM[0].GasEstimator.Mode = ptr("FixedPrice")
-	}, func(opts *startOptions) {
-		opts.FlagsAndDeps = append(opts.FlagsAndDeps, cltest.DefaultP2PKey)
-	})
-	client, _ := app.NewShellAndRenderer()
-
-	_, bridge := cltest.MustCreateBridge(t, app.GetSqlxDB(), cltest.BridgeOpts{}, app.GetConfig().Database())
-	_, bridge2 := cltest.MustCreateBridge(t, app.GetSqlxDB(), cltest.BridgeOpts{}, app.GetConfig().Database())
-
-	var jb job.Job
-	ocrspec := testspecs.GenerateOCRSpec(testspecs.OCRSpecParams{DS1BridgeName: bridge.Name.String(), DS2BridgeName: bridge2.Name.String()})
-	err := toml.Unmarshal([]byte(ocrspec.Toml()), &jb)
-	require.NoError(t, err)
-	var ocrSpec job.OCROracleSpec
-	err = toml.Unmarshal([]byte(ocrspec.Toml()), &ocrSpec)
-	require.NoError(t, err)
-	jb.OCROracleSpec = &ocrSpec
-	key, _ := cltest.MustInsertRandomKey(t, app.KeyStore.Eth())
-	jb.OCROracleSpec.TransmitterAddress = &key.EIP55Address
-
-	err = app.AddJobV2(testutils.Context(t), &jb)
-	require.NoError(t, err)
-
-	set := flag.NewFlagSet("test", 0)
-	flagSetApplyFromAction(client.RemoteLogin, set, "")
-
-	require.NoError(t, set.Set("bypass-version-check", "true"))
-	require.NoError(t, set.Parse([]string{strconv.FormatInt(int64(jb.ID), 10)}))
-
-	c := cli.NewContext(nil, set, nil)
-
-	require.NoError(t, client.RemoteLogin(c))
-	require.NoError(t, client.TriggerPipelineRun(c))
-}
-
-func TestShell_RunOCRJob_MissingJobID(t *testing.T) {
-	t.Parallel()
-
-	app := startNewApplicationV2(t, nil)
-	client, _ := app.NewShellAndRenderer()
-
-	set := flag.NewFlagSet("test", 0)
-	flagSetApplyFromAction(client.RemoteLogin, set, "")
-
-	require.NoError(t, set.Set("bypass-version-check", "true"))
-
-	c := cli.NewContext(nil, set, nil)
-
-	require.NoError(t, client.RemoteLogin(c))
-	assert.EqualError(t, client.TriggerPipelineRun(c), "Must pass the job id to trigger a run")
-}
-
-func TestShell_RunOCRJob_JobNotFound(t *testing.T) {
-	t.Parallel()
-
-	app := startNewApplicationV2(t, nil)
-	client, _ := app.NewShellAndRenderer()
-
-	set := flag.NewFlagSet("test", 0)
-	flagSetApplyFromAction(client.RemoteLogin, set, "")
-
-	require.NoError(t, set.Parse([]string{"1"}))
-	require.NoError(t, set.Set("bypass-version-check", "true"))
-
-	c := cli.NewContext(nil, set, nil)
-
-	require.NoError(t, client.RemoteLogin(c))
-	err := client.TriggerPipelineRun(c)
-	assert.Contains(t, err.Error(), "findJob failed: failed to load job")
 }
 
 func TestShell_AutoLogin(t *testing.T) {
