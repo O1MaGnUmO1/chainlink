@@ -71,7 +71,7 @@ var VRFCoordinatorV2ABI = VRFCoordinatorV2MetaData.ABI
 
 var VRFCoordinatorV2Bin = VRFCoordinatorV2MetaData.Bin
 
-func DeployVRFCoordinatorV2(auth *bind.TransactOpts, backend bind.ContractBackend, link common.Address, blockhashStore common.Address, linkEthFeed common.Address) (common.Address, *types.Transaction, *VRFCoordinatorV2, error) {
+func DeployVRFCoordinatorV2(auth *bind.TransactOpts, backend bind.ContractBackend, link common.Address, blockhashStore common.Address) (common.Address, *types.Transaction, *VRFCoordinatorV2, error) {
 	parsed, err := VRFCoordinatorV2MetaData.GetAbi()
 	if err != nil {
 		return common.Address{}, nil, nil, err
@@ -80,7 +80,7 @@ func DeployVRFCoordinatorV2(auth *bind.TransactOpts, backend bind.ContractBacken
 		return common.Address{}, nil, nil, errors.New("GetABI returned nil")
 	}
 
-	address, tx, contract, err := bind.DeployContract(auth, *parsed, common.FromHex(VRFCoordinatorV2Bin), backend, link, blockhashStore, linkEthFeed)
+	address, tx, contract, err := bind.DeployContract(auth, *parsed, common.FromHex(VRFCoordinatorV2Bin), backend, link, blockhashStore)
 	if err != nil {
 		return common.Address{}, nil, nil, err
 	}

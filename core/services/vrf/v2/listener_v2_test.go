@@ -54,9 +54,7 @@ func txMetaSubIDs(t *testing.T, vrfVersion vrfcommon.Version, subID *big.Int) (*
 		txMetaSubID       *uint64
 		txMetaGlobalSubID *string
 	)
-	if vrfVersion == vrfcommon.V2Plus {
-		txMetaGlobalSubID = ptr(subID.String())
-	} else if vrfVersion == vrfcommon.V2 {
+	if vrfVersion == vrfcommon.V2 {
 		txMetaSubID = ptr(subID.Uint64())
 	} else {
 		t.Errorf("unsupported vrf version: %s", vrfVersion)
@@ -257,10 +255,6 @@ func TestMaybeSubtractReservedLinkV2(t *testing.T) {
 	testMaybeSubtractReservedLink(t, vrfcommon.V2)
 }
 
-func TestMaybeSubtractReservedLinkV2Plus(t *testing.T) {
-	testMaybeSubtractReservedLink(t, vrfcommon.V2Plus)
-}
-
 func testMaybeSubtractReservedNative(t *testing.T, vrfVersion vrfcommon.Version) {
 	db := pgtest.NewSqlxDB(t)
 	lggr := logger.TestLogger(t)
@@ -334,10 +328,6 @@ func testMaybeSubtractReservedNative(t *testing.T, vrfVersion vrfcommon.Version)
 	start, err = listener.MaybeSubtractReservedEth(ctx, big.NewInt(100_000), chainID, subID, vrfVersion)
 	require.NoError(t, err)
 	require.Equal(t, "70000", start.String())
-}
-
-func TestMaybeSubtractReservedNativeV2Plus(t *testing.T) {
-	testMaybeSubtractReservedNative(t, vrfcommon.V2Plus)
 }
 
 func TestMaybeSubtractReservedNativeV2(t *testing.T) {

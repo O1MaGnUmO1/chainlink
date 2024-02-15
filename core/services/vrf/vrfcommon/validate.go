@@ -95,6 +95,7 @@ func ValidatedVRFSpec(tomlString string) (job.Job, error) {
 		}
 	}
 	if !foundVRFTask {
+		fmt.Println("Not Found----------------------------------------")
 		return jb, errors.Wrapf(ErrKeyNotSet, "invalid pipeline, expected a vrf task")
 	}
 

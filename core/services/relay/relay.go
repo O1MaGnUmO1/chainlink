@@ -14,14 +14,8 @@ type ChainID = string
 
 var (
 	EVM             Network = "evm"
-	Cosmos          Network = "cosmos"
-	Solana          Network = "solana"
-	StarkNet        Network = "starknet"
 	SupportedRelays         = map[Network]struct{}{
-		EVM:      {},
-		Cosmos:   {},
-		Solana:   {},
-		StarkNet: {},
+		EVM: {},
 	}
 )
 
@@ -43,7 +37,7 @@ func NewID(n Network, c ChainID) ID {
 }
 
 var idRegex = regexp.MustCompile(
-	fmt.Sprintf("^((%s)|(%s)|(%s)|(%s))\\.", EVM, Cosmos, Solana, StarkNet),
+	fmt.Sprintf("^((%s))\\.", EVM),
 )
 
 func (i *ID) UnmarshalString(s string) error {

@@ -173,9 +173,7 @@ func (lsn *listenerV2) processPendingVRFRequests(ctx context.Context, pendingReq
 		} else {
 			// Happy path - sub is active.
 			startLinkBalance = sub.Balance()
-			if sub.Version() == vrfcommon.V2Plus {
-				startEthBalance = sub.NativeBalance()
-			}
+
 			subIsActive = true
 		}
 
@@ -203,9 +201,7 @@ func (lsn *listenerV2) processPendingVRFRequests(ctx context.Context, pendingReq
 // and returns that value if there are no errors.
 func (lsn *listenerV2) MaybeSubtractReservedLink(ctx context.Context, startBalance *big.Int, chainID *big.Int, subID *big.Int, vrfVersion vrfcommon.Version) (*big.Int, error) {
 	var metaField string
-	if vrfVersion == vrfcommon.V2Plus {
-		metaField = txMetaGlobalSubId
-	} else if vrfVersion == vrfcommon.V2 {
+	if vrfVersion == vrfcommon.V2 {
 		metaField = txMetaFieldSubId
 	} else {
 		return nil, errors.Errorf("unsupported vrf version %s", vrfVersion)
@@ -241,42 +237,12 @@ func (lsn *listenerV2) MaybeSubtractReservedLink(ctx context.Context, startBalan
 // have not been fully confirmed yet on-chain, and subtracts that from the given startBalance,
 // and returns that value if there are no errors.
 func (lsn *listenerV2) MaybeSubtractReservedEth(ctx context.Context, startBalance *big.Int, chainID *big.Int, subID *big.Int, vrfVersion vrfcommon.Version) (*big.Int, error) {
-	var metaField string
-	if vrfVersion == vrfcommon.V2Plus {
-		metaField = txMetaGlobalSubId
-	} else if vrfVersion == vrfcommon.V2 {
+	if vrfVersion == vrfcommon.V2 {
 		// native payment is not supported for v2, so returning 0 reserved ETH
 		return big.NewInt(0), nil
 	} else {
 		return nil, errors.Errorf("unsupported vrf version %s", vrfVersion)
 	}
-	txes, err := lsn.chain.TxManager().FindTxesByMetaFieldAndStates(ctx, metaField, subID.String(), reserveEthLinkQueryStates, chainID)
-	if err != nil && !errors.Is(err, sql.ErrNoRows) {
-		return nil, fmt.Errorf("TXM FindTxesByMetaFieldAndStates failed: %w", err)
-	}
-
-	reservedEthSum := big.NewInt(0)
-	// Aggregate non-null MaxEth from all txes returned
-	for _, tx := range txes {
-		var meta *txmgrtypes.TxMeta[common.Address, common.Hash]
-		meta, err = tx.GetMeta()
-		if err != nil {
-			return nil, fmt.Errorf("GetMeta for Tx failed: %w", err)
-		}
-		if meta != nil && meta.MaxEth != nil {
-			txMaxEth, success := new(big.Int).SetString(*meta.MaxEth, 10)
-			if !success {
-				return nil, fmt.Errorf("converting reserved ETH %s", *meta.MaxEth)
-			}
-
-			reservedEthSum.Add(reservedEthSum, txMaxEth)
-		}
-	}
-
-	if startBalance != nil {
-		return new(big.Int).Sub(startBalance, reservedEthSum), nil
-	}
-	return big.NewInt(0), nil
 }
 
 func (lsn *listenerV2) processRequestsPerSubBatchHelper(
@@ -802,9 +768,7 @@ func (lsn *listenerV2) processRequestsPerSubHelper(
 					txMetaSubID       *uint64
 					txMetaGlobalSubID *string
 				)
-				if lsn.coordinator.Version() == vrfcommon.V2Plus {
-					txMetaGlobalSubID = ptr(p.req.req.SubID().String())
-				} else if lsn.coordinator.Version() == vrfcommon.V2 {
+				if lsn.coordinator.Version() == vrfcommon.V2 {
 					txMetaSubID = ptr(p.req.req.SubID().Uint64())
 				}
 				requestID := common.BytesToHash(p.req.req.RequestID().Bytes())
